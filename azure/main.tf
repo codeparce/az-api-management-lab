@@ -1,3 +1,8 @@
+# Random suffix
+resource "random_id" "suffix" {
+  byte_length = 3
+}
+
 resource "azurerm_resource_group" "rg" {
   name     = "resources-apim-lab"
   location = "East US"
@@ -6,6 +11,7 @@ resource "azurerm_resource_group" "rg" {
 
 module "funcapp" {
   source                  = "./functions"
+  random_id               = random_id.suffix.hex
   resource_group_location = azurerm_resource_group.rg.location
   resource_group_name     = azurerm_resource_group.rg.name
 
@@ -19,4 +25,17 @@ module "funcapp" {
 
   subnet_id = var.subnet_manager_id
 
+}
+
+module "appServivces" {
+  source                  = "./service"
+  resource_group_location = azurerm_resource_group.rg.location
+  resource_group_name     = azurerm_resource_group.rg.name
+}
+
+module "containerApps" {
+  source                     = "./container"
+  resource_group_location    = azurerm_resource_group.rg.location
+  resource_group_name        = azurerm_resource_group.rg.name
+  log_analytics_workspace_id = var.log_analytics_workspace_id
 }

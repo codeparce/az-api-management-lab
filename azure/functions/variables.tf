@@ -26,3 +26,8 @@ variable "resource_group_location" {
 variable "resource_group_name" {
   type = string
 }
+
+
+variable "random_id" {
+  type = string
+}

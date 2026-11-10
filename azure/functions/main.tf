@@ -1,13 +1,7 @@
 
-
-# Random suffix
-resource "random_id" "suffix" {
-  byte_length = 3 
-}
-
 # Service Plan (Flex Consumption)
 resource "azurerm_service_plan" "asp" {
-  name                = "function-api-plan-${random_id.suffix.hex}"
+  name                = "function-api-plan-${var.random_id}"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
   
@@ -17,7 +11,7 @@ resource "azurerm_service_plan" "asp" {
 
 # Azure Function App
 resource "azurerm_function_app_flex_consumption" "alfa" {
-  name                = "function-api-${random_id.suffix.hex}"
+  name                = "function-api-${var.random_id}"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
 
@@ -37,7 +31,6 @@ resource "azurerm_function_app_flex_consumption" "alfa" {
 
   // Configuración de red
   https_only                = true
-  virtual_network_subnet_id = var.subnet_id
 
   identity {
     type = "UserAssigned"
@@ -59,9 +52,6 @@ resource "azurerm_function_app_flex_consumption" "alfa" {
     "AzureWebJobsStorage__accountName" = var.storage_account_name
     "AzureWebJobsStorage__credential"  = "managedidentity"
     "AzureWebJobsStorage__clientId"    = azurerm_user_assigned_identity.identity.client_id
-
-    "APPINSIGHTS_INSTRUMENTATIONKEY"        = azurerm_application_insights.insights.instrumentation_key
-    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.insights.connection_string
 
     "FUNCTIONS_NODE_BLOCK_ON_ENTRY_POINT_ERROR" = "true"
   }
